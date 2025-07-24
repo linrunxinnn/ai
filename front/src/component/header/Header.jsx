@@ -18,6 +18,7 @@ import { useNavigate } from "react-router-dom";
 
 const HeaderBar = ({ title }) => {
   const navigate = useNavigate();
+  // const user = useSelector((state) => state.user.user);
 
   const onLogout = () => {
     //退出登录
@@ -38,7 +39,7 @@ const HeaderBar = ({ title }) => {
   // const user = useSelector((state) => state.user.user);
   const user = {
     username: "张三",
-    avatar: qg, // 示例头像链接
+    // avatar: qg, // 示例头像链接
   };
 
   return (

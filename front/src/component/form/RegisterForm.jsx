@@ -7,6 +7,8 @@ import {
   PhoneOutlined,
 } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { registerUser } from "../../store/slice/userSlice.js";
 
 const RegisterForm = () => {
   const [form] = Form.useForm();
@@ -48,9 +50,17 @@ const RegisterForm = () => {
     setLoading(true);
     //打印用户填写信息
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      console.log(values);
-      message.success(`注册成功，欢迎 ${values.email}`);
+      // await new Promise((resolve) => setTimeout(resolve, 1000));
+      const result = await dispatch(registerUser(values)).unwrap();
+      if (registerUser.fulfilled.match(result)) {
+        // 表示 registerUser 请求成功，进入 fulfilled 分支
+        console.log("注册成功", result.payload);
+        message.success(`注册成功，欢迎 ${values.name}`);
+      } else if (registerUser.rejected.match(result)) {
+        // 表示 registerUser 请求失败，进入 rejected 分支
+        console.log("注册失败", result.payload);
+        message.error("注册失败，请稍后再试");
+      }
       // navigate("/Collect");
     } catch {
       message.error("注册失败");
@@ -82,7 +92,7 @@ const RegisterForm = () => {
 
           <Form.Item
             name="nationality"
-            label="民族"
+            // label="民族"
             rules={[{ required: true, message: "请选择民族" }]}
           >
             <Select placeholder="请选择民族">
@@ -178,7 +188,7 @@ const RegisterForm = () => {
             <Input prefix={<PhoneOutlined />} placeholder="手机号" />
           </Form.Item>
 
-          <Form.Item style={{ marginBottom: 0 }}>
+          {/* <Form.Item style={{ marginBottom: 0 }}>
             <Form.Item
               name="code"
               rules={[
@@ -208,7 +218,7 @@ const RegisterForm = () => {
                 {countdown > 0 ? `${countdown}s` : "获取验证码"}
               </Button>
             </Form.Item>
-          </Form.Item>
+          </Form.Item> */}
 
           <Form.Item
             name="password"

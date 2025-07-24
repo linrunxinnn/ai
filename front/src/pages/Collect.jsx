@@ -10,14 +10,14 @@ const Collect = () => {
   const [capturedImages, setCapturedImages] = useState([]);
   const [progress, setProgress] = useState(0);
   const maxImages = 100;
-  const intervalTime = 5000; // 5秒
+  const intervalTime = 5000; // 5秒间隔
 
-  const [message, setMessage] = useState("你好");
-  api.post("", message, {
-    headers: {
-      "Content-Type": "multipart/form-data",
-    },
-  });
+  // const [message, setMessage] = useState({
+  //   userId: 100,
+  //   endTime: "2025-09-13 01:42:29",
+  //   reason: "reprehenderit Ut aute consequat",
+  // });
+  // api.get("/applyDevelopers", message)
 
   useEffect(() => {
     // 打开摄像头

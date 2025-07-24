@@ -9,7 +9,7 @@ import styles from "./ChatModule.module.css";
 
 const { TextArea } = Input;
 
-const ChatModule = ({ onSend, initialMessages = [] }) => {
+const ChatModule = ({ onSend, initialMessages = [], getTitle }) => {
   const [messages, setMessages] = useState(initialMessages);
   const [input, setInput] = useState("");
   const [isListening, setIsListening] = useState(false);
@@ -101,6 +101,11 @@ const ChatModule = ({ onSend, initialMessages = [] }) => {
       };
 
       setMessages((prev) => [...prev, newMessage]);
+
+      //如果为第一条信息，则调用getTitle函数
+      if (messages.length === 0) {
+        getTitle(newMessage.content);
+      }
 
       // 调用外部onSend回调
       if (onSend) {

@@ -1,18 +1,33 @@
 import { message } from "antd";
 import api from "../index";
+import aiApi from "../aiapi.js";
 
 export const login = async (credentials) => {
-  try {
-    const response = await api.post("/user/loginbypassword", credentials);
-    return response.data;
-  } catch (error) {
-    message.error("登录失败");
-    console.log("登录失败", error);
-    throw error;
-  }
+  const response = await api.post("/user/userLogin", credentials);
+  return response.data;
 };
 
-export const faceLogin = async () => {};
+export const register = async (userData) => {
+  const response = await api.post("/user/userRegister", userData);
+  return response.data;
+};
+
+export const faceLogin = async (imageData) => {
+  // const response = await axios.post("/user/faceLogin", formData, {
+  //   headers: {
+  //     "Content-Type": "multipart/form-data",
+  //   },
+  // });
+  // return response.data;
+
+  await new Promise((resolve) => setTimeout(resolve, 500));
+  console.log("模拟接收到 FormData，对应的 Blob 是：", imageData.get("image"));
+
+  return {
+    code: 200,
+    msg: "识别成功",
+  };
+};
 
 // export const logout = async () => {
 //   try {

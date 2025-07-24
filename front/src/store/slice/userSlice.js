@@ -1,21 +1,29 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { login } from "../../api/userservice/user.js";
+import { login, register } from "../../api/userservice/user.js";
 
 //导入axios的登录，退出账号等，这里假定导入为axios
 
 //登录
 export const loginUser = createAsyncThunk(
-  "", //登录用户API
+  "/user/login",
+  async (credentials, { rejectWithValue }) => {
+    try {
+      const data = await login(credentials);
+      return data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || "登录失败");
+    }
+  }
+);
+
+export const registerUser = createAsyncThunk(
+  "/user/userRegister", //注册用户API
   async (userData, { rejectWithValue }) => {
     try {
-      const response = await login(userData);
-      // 假设login函数返回的response.data包含user, token, role等信息
-      if (!response || !response.user || !response.token || !response.role) {
-        throw new Error("Invalid response structure");
-      }
-      return response.data;
+      const data = await register(userData);
+      return data;
     } catch (error) {
-      return rejectWithValue(error.response.data);
+      return rejectWithValue(error.response?.data || "注册失败");
     }
   }
 );
@@ -42,13 +50,6 @@ const userSlice = createSlice({
     error: null,
   },
   reducers: {
-    //登录存入信息
-    loginSuccess: (state, action) => {
-      state.user = action.payload.user;
-      state.token = action.payload.token;
-      localStorage.setItem("user", JSON.stringify(action.payload.user));
-      localStorage.setItem("token", action.payload.token);
-    },
     logout: (state) => {
       state.user = null;
       state.token = null;
@@ -73,12 +74,27 @@ const userSlice = createSlice({
         state.loading = false;
         state.user = action.payload.user;
         state.token = action.payload.token;
-        state.role = action.payload.role;
         state.error = null;
         localStorage.setItem("token", action.payload.token);
         localStorage.setItem("user", JSON.stringify(action.payload.user));
       })
       .addCase(loginUser.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase(registerUser.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(registerUser.fulfilled, (state, action) => {
+        state.loading = false;
+        state.user = action.payload.user;
+        state.token = action.payload.token;
+        state.error = null;
+        localStorage.setItem("token", action.payload.token);
+        localStorage.setItem("user", JSON.stringify(action.payload.user));
+      })
+      .addCase(registerUser.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });

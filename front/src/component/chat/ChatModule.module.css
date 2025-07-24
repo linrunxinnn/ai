@@ -23,6 +23,38 @@
   color: #333;
   margin-bottom: 40px;
   text-align: center;
+  cursor: pointer;
+}
+
+.title:hover {
+  animation: colorJump 5s infinite;
+}
+
+@keyframes colorJump {
+  0% {
+    color: #ff6b6b;
+  }
+  14% {
+    color: #4ecdc4;
+  }
+  28% {
+    color: #45b7d1;
+  }
+  42% {
+    color: #96ceb4;
+  }
+  56% {
+    color: #ffeaa7;
+  }
+  70% {
+    color: #dda0dd;
+  }
+  84% {
+    color: #98d8c8;
+  }
+  100% {
+    color: #ff6b6b;
+  }
 }
 
 .activatedLayout {
@@ -86,7 +118,7 @@
 }
 
 .initialInputContainer {
-  width: 100%;
+  width: 50%;
 }
 
 .inputArea {
