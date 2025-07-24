@@ -3,6 +3,7 @@ import App from "../App.jsx";
 import Home from "../pages/Home.jsx";
 import Sign from "../pages/Sign.jsx";
 import Collect from "../pages/Collect.jsx";
+import ManagerRouter from "../component/protect/Protectrouter.jsx";
 
 export const router = createBrowserRouter([
   {
@@ -15,7 +16,11 @@ export const router = createBrowserRouter([
       },
       {
         path: "/home",
-        element: <Home />,
+        element: (
+          <ManagerRouter>
+            <Home />
+          </ManagerRouter>
+        ),
       },
       {
         path: "/collect",

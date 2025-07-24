@@ -15,18 +15,30 @@ const { Title } = Typography;
 import style from "./Header.module.css";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { logout } from "../../store/slice/userSlice.js";
+import { useDispatch } from "react-redux";
 
-const HeaderBar = ({ title }) => {
+const HeaderBar = ({ title, avatar }) => {
+  const dispatch = useDispatch();
   const navigate = useNavigate();
-  // const user = useSelector((state) => state.user.user);
+  const user = JSON.parse(localStorage.getItem("user"));
+  console.log("user", user);
 
   const onLogout = () => {
     //退出登录
     message.success("退出登录成功");
+    localStorage.removeItem("user");
+    dispatch(logout());
+
     navigate("/");
   };
 
   const menuItems = [
+    {
+      key: "profile",
+      icon: <UserOutlined />,
+      label: user.name,
+    },
     {
       key: "logout",
       icon: <LogoutOutlined />,
@@ -35,18 +47,11 @@ const HeaderBar = ({ title }) => {
     },
   ];
 
-  //获取用户的信息
-  // const user = useSelector((state) => state.user.user);
-  const user = {
-    username: "张三",
-    // avatar: qg, // 示例头像链接
-  };
-
   return (
     <Header className={style.header}>
       {/* 左侧 Logo */}
       <div className={style.logoContainer}>
-        <img src={qg} alt="Logo" className={style.logo} />
+        <img src={avatar} alt="Logo" className={style.logo} />
       </div>
 
       {/* 中间标题 */}

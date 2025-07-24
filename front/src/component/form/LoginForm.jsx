@@ -37,17 +37,12 @@ const LoginForm = () => {
     setLoading(true);
     try {
       const result = await dispatch(loginUser(values)).unwrap();
-      if (loginUser.fulfilled.match(result)) {
-        // 表示 loginUser 请求成功，进入 fulfilled 分支
-        console.log("登录成功", result.payload);
-      } else if (loginUser.rejected.match(result)) {
-        // 表示 loginUser 请求失败，进入 rejected 分支
-        console.log("登录失败", result.payload);
-      }
-      message.success(`登录成功，欢迎 ${values.username}`);
-      // navigate("/Home");
-    } catch {
+      console.log("登录成功", result.payload);
+      message.success(`登录成功，欢迎 ${result.data.name}`);
+      navigate("/Home");
+    } catch (error) {
       message.error("登录失败");
+      console.error("登录失败", error);
     } finally {
       setLoading(false);
     }
@@ -163,7 +158,7 @@ const LoginForm = () => {
         <Form form={form} onFinish={handleAccountLogin} autoComplete="off">
           {loginType === "email" ? (
             <Form.Item
-              name="email"
+              name="identity"
               rules={[
                 { required: true, message: "请输入邮箱" },
                 { type: "email", message: "请输入有效的邮箱" },
@@ -173,7 +168,7 @@ const LoginForm = () => {
             </Form.Item>
           ) : (
             <Form.Item
-              name="phone"
+              name="identity"
               rules={[
                 { required: true, message: "请输入手机号" },
                 { pattern: /^1[3-9]\d{9}$/, message: "请输入有效的手机号" },

@@ -6,6 +6,9 @@ import {
   AudioMutedOutlined,
 } from "@ant-design/icons";
 import styles from "./ChatModule.module.css";
+import { changeUserData, getUserInfo } from "../../api/userservice/user.js";
+import { useSelector } from "react-redux";
+import qg from "../../assets/qg.png";
 
 const { TextArea } = Input;
 
@@ -18,6 +21,8 @@ const ChatModule = ({ onSend, initialMessages = [], getTitle }) => {
   const recognitionRef = useRef(null);
   const scrollRef = useRef(null);
   const [isSending, setIsSending] = useState(false);
+  const user = JSON.parse(localStorage.getItem("user"));
+  const userId = user.id; // 假设用户ID存
 
   // 语音识别配置
   useEffect(() => {
@@ -92,7 +97,7 @@ const ChatModule = ({ onSend, initialMessages = [], getTitle }) => {
 
   // 发送消息
 
-  const handleSend = () => {
+  const handleSend = async () => {
     if (input.trim()) {
       const newMessage = {
         content: input.trim(),
@@ -112,6 +117,23 @@ const ChatModule = ({ onSend, initialMessages = [], getTitle }) => {
         onSend(newMessage);
         // pollForAIResponse();
       }
+      // try {
+      //   await changeUserData({
+      //     name: "linlinlin1",
+      //   });
+      //   console.log("更新用户数据成功");
+      // } catch (error) {
+      //   console.error("更新用户数据失败", error);
+      // }
+
+      // try {
+      //   const response = await getUserInfo(userId);
+      //   console.log("fasongId", userId);
+      //   console.log("获取用户信息成功", response);
+      //   message.success("获取用户信息成功");
+      // } catch (error) {
+      //   console.error("获取用户信息失败", error);
+      // }
 
       setInput("");
       setActivated(true);

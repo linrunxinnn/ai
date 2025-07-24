@@ -16,6 +16,7 @@ const RegisterForm = () => {
   const [codeLoading, setCodeLoading] = useState(false);
   const [countdown, setCountdown] = useState(0);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const handleGetCode = async () => {
     try {
@@ -47,23 +48,16 @@ const RegisterForm = () => {
   };
 
   const handleRegister = async (values) => {
+    console.log("注册信息", values);
     setLoading(true);
-    //打印用户填写信息
     try {
       // await new Promise((resolve) => setTimeout(resolve, 1000));
       const result = await dispatch(registerUser(values)).unwrap();
-      if (registerUser.fulfilled.match(result)) {
-        // 表示 registerUser 请求成功，进入 fulfilled 分支
-        console.log("注册成功", result.payload);
-        message.success(`注册成功，欢迎 ${values.name}`);
-      } else if (registerUser.rejected.match(result)) {
-        // 表示 registerUser 请求失败，进入 rejected 分支
-        console.log("注册失败", result.payload);
-        message.error("注册失败，请稍后再试");
-      }
-      // navigate("/Collect");
-    } catch {
+      message.success("注册成功，请收集人脸信息");
+      navigate("/Collect");
+    } catch (error) {
       message.error("注册失败");
+      console.error("注册失败", error);
     } finally {
       setLoading(false);
     }
@@ -157,7 +151,7 @@ const RegisterForm = () => {
           </Form.Item>
 
           <Form.Item
-            name="id_card"
+            name="idCard"
             rules={[
               { required: true, message: "请输入身份证号" },
               {
@@ -231,7 +225,7 @@ const RegisterForm = () => {
           </Form.Item>
 
           <Form.Item
-            name="confirm"
+            name="password"
             dependencies={["password"]}
             rules={[
               { required: true, message: "请确认密码" },

@@ -9,6 +9,7 @@ export const loginUser = createAsyncThunk(
   async (credentials, { rejectWithValue }) => {
     try {
       const data = await login(credentials);
+      console.log("登录成功", data);
       return data;
     } catch (error) {
       return rejectWithValue(error.response?.data || "登录失败");
@@ -21,6 +22,7 @@ export const registerUser = createAsyncThunk(
   async (userData, { rejectWithValue }) => {
     try {
       const data = await register(userData);
+      console.log("注册成功", data);
       return data;
     } catch (error) {
       return rejectWithValue(error.response?.data || "注册失败");
@@ -28,32 +30,18 @@ export const registerUser = createAsyncThunk(
   }
 );
 
-// // 获取用户信息
-// export const fetchUserInfo = createAsyncThunk(
-//   "", //获取用户信息API
-//   async (userId, { rejectWithValue }) => {
-//     try {
-//       const response = await axios.getUserInfo(userId);
-//       return response;
-//     } catch (error) {
-//       return rejectWithValue(error.response?.data || error.message);
-//     }
-//   }
-// );
-
 const userSlice = createSlice({
   name: "user",
   initialState: {
-    user: null,
-    token: localStorage.getItem("token") ? localStorage.getItem("token") : null,
+    id: null,
+    name: null,
     loading: false,
     error: null,
   },
   reducers: {
     logout: (state) => {
-      state.user = null;
-      state.token = null;
-      localStorage.removeItem("token");
+      state.name = null;
+      state.id = null;
       localStorage.removeItem("user");
     },
     clearError: (state) => {
@@ -69,14 +57,15 @@ const userSlice = createSlice({
       .addCase(loginUser.pending, (state) => {
         state.loading = true;
         state.error = null;
+        state.name = null;
+        state.id = null;
       })
       .addCase(loginUser.fulfilled, (state, action) => {
         state.loading = false;
-        state.user = action.payload.user;
-        state.token = action.payload.token;
+        state.name = action.payload.data.name;
+        state.id = action.payload.data.id;
         state.error = null;
-        localStorage.setItem("token", action.payload.token);
-        localStorage.setItem("user", JSON.stringify(action.payload.user));
+        localStorage.setItem("user", JSON.stringify(action.payload.data));
       })
       .addCase(loginUser.rejected, (state, action) => {
         state.loading = false;
@@ -88,11 +77,10 @@ const userSlice = createSlice({
       })
       .addCase(registerUser.fulfilled, (state, action) => {
         state.loading = false;
-        state.user = action.payload.user;
-        state.token = action.payload.token;
+        state.name = action.payload.data.name;
+        state.id = action.payload.data.id;
         state.error = null;
-        localStorage.setItem("token", action.payload.token);
-        localStorage.setItem("user", JSON.stringify(action.payload.user));
+        localStorage.setItem("user", JSON.stringify(action.payload.data));
       })
       .addCase(registerUser.rejected, (state, action) => {
         state.loading = false;
