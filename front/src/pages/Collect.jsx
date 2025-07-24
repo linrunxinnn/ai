@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Button, Progress, message, Alert } from "antd";
 import style from "./Collect.module.css";
+import api from "../api/index.js";
 
 const Collect = () => {
   const videoRef = useRef(null);
@@ -10,6 +11,13 @@ const Collect = () => {
   const [progress, setProgress] = useState(0);
   const maxImages = 100;
   const intervalTime = 5000; // 5秒
+
+  const [message, setMessage] = useState("你好");
+  api.post("", message, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
 
   useEffect(() => {
     // 打开摄像头
@@ -31,6 +39,27 @@ const Collect = () => {
     };
   }, []);
 
+  //上传所有图片
+  const uploadAllImages = async () => {
+    const formData = new FormData();
+    capturedImages.forEach((blob, index) => {
+      formData.append("images", blob, `image_${index}.png`);
+    });
+
+    try {
+      const response = await api.post("/upload", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+      console.log("批量上传成功", response.data);
+      message.success("全部图片上传成功！");
+    } catch (error) {
+      console.error("批量上传失败", error);
+      message.error("批量上传失败！");
+    }
+  };
+
   useEffect(() => {
     let timer;
     if (collecting) {
@@ -43,6 +72,13 @@ const Collect = () => {
         }
         captureImage();
       }, intervalTime);
+      if (capturedImages.length >= maxImages) {
+        clearInterval(timer);
+        setCollecting(false);
+        message.success("采集完成，开始上传！");
+        uploadAllImages();
+        return;
+      }
     }
     return () => clearInterval(timer);
   }, [collecting, capturedImages]);
@@ -50,9 +86,37 @@ const Collect = () => {
   const captureImage = () => {
     const context = canvasRef.current.getContext("2d");
     context.drawImage(videoRef.current, 0, 0, 320, 240);
-    const image = canvasRef.current.toDataURL("image/png");
-    setCapturedImages((prev) => [...prev, image]);
-    setProgress(((capturedImages.length + 1) / maxImages) * 100);
+
+    canvasRef.current.toBlob((blob) => {
+      if (!blob) {
+        message.error("捕获图像失败");
+        return;
+      }
+      setCapturedImages((prev) => {
+        const updated = [...prev, blob];
+        setProgress((updated.length / maxImages) * 100);
+        return updated;
+      });
+    }, "image/png");
+    // canvasRef.current.toBlob(async (blob) => {
+    //   if (!blob) return;
+
+    //   const formData = new FormData();
+    //   formData.append("image", blob, `image_${Date.now()}.png`); // 设置文件名
+
+    //   try {
+    //     await api.post("", formData, {
+    //       headers: {
+    //         "Content-Type": "multipart/form-data",
+    //       },
+    //     });
+    //     setCapturedImages((prev) => [...prev, URL.createObjectURL(blob)]);
+    //     setProgress(((capturedImages.length + 1) / maxImages) * 100);
+    //   } catch (error) {
+    //     console.error("上传失败", error);
+    //     message.error("图片上传失败");
+    //   }
+    // }, "image/png");
   };
 
   const handleStart = () => {
@@ -83,6 +147,15 @@ const Collect = () => {
         <div>
           <Button type="primary" onClick={handleStart} disabled={collecting}>
             {collecting ? "采集中..." : "开始采集"}
+          </Button>
+          {/* 增加一个按钮，用于停止采集 */}
+          <Button
+            type="danger"
+            onClick={() => setCollecting(false)}
+            disabled={!collecting}
+            style={{ marginLeft: 10 }}
+          >
+            停止采集
           </Button>
         </div>
         <div style={{ width: 320 }}>

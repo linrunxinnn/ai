@@ -65,7 +65,13 @@ const ResetForm = () => {
           <Form.Item style={{ marginBottom: 0 }}>
             <Form.Item
               name="code"
-              rules={[{ required: true, message: "请输入验证码" }]}
+              rules={[
+                { required: true, message: "请输入验证码" },
+                {
+                  pattern: /^\d{6}$/,
+                  message: "验证码必须是6位数字",
+                },
+              ]}
               style={{ display: "inline-block", width: "60%" }}
             >
               <Input prefix={<SafetyOutlined />} placeholder="验证码" />

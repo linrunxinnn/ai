@@ -1,22 +1,30 @@
 import React, { useState } from "react";
-import { Card, Tabs, Form, Input, Button, message } from "antd";
+import { Card, Tabs, Form, Input, Button, message, Typography } from "antd";
 import {
   UserOutlined,
   LockOutlined,
   SmileOutlined,
   MailOutlined,
+  PhoneOutlined,
 } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
+const { Text } = Typography;
+import { loginUser, loginSuccess } from "../../store/slice/userSlice.js";
 
 const LoginForm = () => {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const [loginType, setLoginType] = useState("email");
 
   const handleAccountLogin = async (values) => {
     setLoading(true);
     try {
       await new Promise((resolve) => setTimeout(resolve, 1000));
+      console.log(values);
+      //调用封装完的登录函数,传入登录的信息
+      //返回的数据存入redux，token存入localStorage
+      // const response = await login(values);
       message.success(`登录成功，欢迎 ${values.username}`);
       //这里需要加上判断，如果已经采集过了就跳转到主页，否则跳转到采集页面
       //navigate("/Home");
@@ -28,10 +36,16 @@ const LoginForm = () => {
     }
   };
 
+  const toggleLoginType = () => {
+    form.resetFields(); // 切换时清空字段
+    setLoginType((prev) => (prev === "email" ? "phone" : "email"));
+  };
+
   const handleFaceLogin = async () => {
     setLoading(true);
     try {
       await new Promise((resolve) => setTimeout(resolve, 1000));
+      //调用封装完的login函数
       message.success("人脸识别登录成功");
     } catch {
       message.error("人脸识别失败");
@@ -46,15 +60,28 @@ const LoginForm = () => {
       label: "账号密码登录",
       children: (
         <Form form={form} onFinish={handleAccountLogin} autoComplete="off">
-          <Form.Item
-            name="email"
-            rules={[
-              { required: true, message: "请输入邮箱" },
-              { type: "email", message: "请输入有效的邮箱" },
-            ]}
-          >
-            <Input prefix={<MailOutlined />} placeholder="邮箱" />
-          </Form.Item>
+          {loginType === "email" ? (
+            <Form.Item
+              name="email"
+              rules={[
+                { required: true, message: "请输入邮箱" },
+                { type: "email", message: "请输入有效的邮箱" },
+              ]}
+            >
+              <Input prefix={<MailOutlined />} placeholder="邮箱" />
+            </Form.Item>
+          ) : (
+            <Form.Item
+              name="phone"
+              rules={[
+                { required: true, message: "请输入手机号" },
+                { pattern: /^1[3-9]\d{9}$/, message: "请输入有效的手机号" },
+              ]}
+            >
+              <Input prefix={<PhoneOutlined />} placeholder="手机号" />
+            </Form.Item>
+          )}
+
           <Form.Item
             name="password"
             rules={[{ required: true, message: "请输入密码" }]}
@@ -65,10 +92,21 @@ const LoginForm = () => {
               autoComplete="current-password"
             />
           </Form.Item>
+
           <Form.Item>
             <Button type="primary" htmlType="submit" block loading={loading}>
               登录
             </Button>
+          </Form.Item>
+
+          <Form.Item style={{ textAlign: "center", marginBottom: 0 }}>
+            <Text
+              type="secondary"
+              style={{ cursor: "pointer" }}
+              onClick={toggleLoginType}
+            >
+              {loginType === "email" ? "使用手机号登录" : "使用邮箱登录"}
+            </Text>
           </Form.Item>
         </Form>
       ),
